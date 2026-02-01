@@ -1,13 +1,14 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm
-
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from . import models
 
 def index(request):
-    if not request.user.is_authenticated:
-        return redirect("login")
+    products = models.Product.objects.all()
 
-    return render(request, "ecomerce/index.html")
+    return render(request, "ecomerce/index.html", {"products": products})
+
 
 def login_view(request):
     if request.user.is_authenticated:
