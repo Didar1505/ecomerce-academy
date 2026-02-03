@@ -1,0 +1,61 @@
+{% extends 'ecomerce/base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">Update Profile</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="row">
+            <!-- User Model Card -->
+            <div class="col-md-6 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Account Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">Username</label>
+                            <input type="text" name="username" class="form-control" value="{{ user.username }}">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" name="email" class="form-control" value="{{ user.email }}">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" name="full_name" class="form-control" value="{{ user.get_full_name }}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customer Model Card -->
+            <div class="col-md-6 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="mb-0">Personal Details</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">Phone Number</label>
+                            <input type="text" name="phone" class="form-control" value="{{ user.customer.phone|default:'' }}">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Address</label>
+                            <textarea name="address" class="form-control" rows="3">{{ user.customer.address|default:'' }}</textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Avatar Image</label>
+                            <input type="file" name="image" class="form-control">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="text-end">
+            <a href="{% url 'profile' %}" class="btn btn-outline-secondary me-2">Cancel</a>
+            <button type="submit" class="btn btn-success px-5">Save Changes</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,93 @@
+{% extends 'ecomerce/base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">My Orders</h2>
+
+    {% if orders %}
+    <div class="accordion" id="ordersAccordion">
+        {% for order in orders %}
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="heading{{ order.id }}">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#collapse{{ order.id }}" aria-expanded="false"
+                    aria-controls="collapse{{ order.id }}">
+                    <div class="d-flex w-100 justify-content-between me-3 align-items-center flex-wrap">
+                        <span>
+                            <strong>Order #{{ order.id }}</strong>
+                            <span class="text-muted ms-2 small">{{ order.created_at|date:"M d, Y" }}</span>
+                        </span>
+                        <div class="mt-2 mt-sm-0">
+                            <span class="badge rounded-pill 
+                                        {% if order.status == 'pending' %}bg-warning text-dark
+                                        {% elif order.status == 'shipped' %}bg-info text-dark
+                                        {% elif order.status == 'delivered' %}bg-success
+                                        {% elif order.status == 'canceled' %}bg-danger
+                                        {% else %}bg-secondary{% endif %}">
+                                {{ order.get_status_display }}
+                            </span>
+                            <span class="ms-3 fw-bold">${{ order.get_total_cost }}</span>
+                        </div>
+                    </div>
+                </button>
+            </h2>
+            <div id="collapse{{ order.id }}" class="accordion-collapse collapse" aria-labelledby="heading{{ order.id }}"
+                data-bs-parent="#ordersAccordion">
+                <div class="accordion-body">
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th scope="col">Product</th>
+                                    <th scope="col">Price</th>
+                                    <th scope="col">Quantity</th>
+                                    <th scope="col" class="text-end">Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in order.items.all %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            {% if item.product and item.product.image %}
+                                            <img src="{{ item.product.image.url }}" alt="{{ item.product.title }}"
+                                                class="rounded me-3"
+                                                style="width: 50px; height: 50px; object-fit: cover;">
+                                            {% else %}
+                                            <div class="bg-light rounded me-3 d-flex align-items-center justify-content-center"
+                                                style="width: 50px; height: 50px;">
+                                                <span class="text-muted small">No Img</span>
+                                            </div>
+                                            {% endif %}
+                                            <span>{{ item.product.title|default:"Product Unavailable" }}</span>
+                                        </div>
+                                    </td>
+                                    <td>${{ item.product.price }}</td>
+
+                                    <td>{{ item.quantity }}</td>
+                                    <td class="text-end">${{ item.get_cost }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% if order.status == 'pending' %}
+                    <div class="text-end">
+                        <form action="{% url 'confirm_order' order.id %}" method="POST">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-primary px-4">Buy Now</button>
+                        </form>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-info" role="alert">
+        You haven't placed any orders yet. <a href="{% url 'index' %}" class="alert-link">Start shopping!</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
